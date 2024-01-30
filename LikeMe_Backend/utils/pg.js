@@ -1,6 +1,5 @@
 const dotenv = require('dotenv');
 const { Pool } = require('pg');
-const { v4: uuidv4 } = require('uuid');
 
 dotenv.config();
 
@@ -13,15 +12,15 @@ const pool = new Pool({
     allowExitOnIdle: true
 });
 
-const getPost = async (titulo, img, descripcion) => {
-    const postId = uuidv4();
-    const consulta = "INSERT INTO posts VALUES ($1, $2, $3, $4, $5) RETURNING *";
-    const values = [postId, titulo, img, descripcion, null];
+const getPost = async (id, titulo, img, descripcion) => {
 
-    try {
-        const result = await pool.query(consulta, values);
-        console.log(result.rows[0]);
-        return result.rows[0];
+
+    try {    
+        const consulta = "INSERT INTO posts (id, titulo, img, descripcion) VALUES ($1, $2, $3, $4) RETURNING *;";
+        const values = [id, titulo, img, descripcion];
+        const { rows } = await pool.query(consulta, values);
+        console.log(rows);
+        return rows;
     } catch (error) {
         console.error('Error al insertar el post:', error);
         throw error;
@@ -30,7 +29,7 @@ const getPost = async (titulo, img, descripcion) => {
 
 const obtenerPost = async () => {
     try {
-        const { rows } = await pool.query("SELECT * FROM posts");
+        const { rows } = await pool.query("SELECT * FROM posts;");
         console.log(rows);
         return rows;
     } catch (error) {
